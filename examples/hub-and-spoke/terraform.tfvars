@@ -70,8 +70,8 @@ management_group_settings = {
   parent_resource_id = "$${root_parent_management_group_id}"
   architecture_name  = "alz_custom" # This param is used to reference the custom architecture definition YAML file in the lib/architecture_definitions folder. The management group hierarchy will be built based on the structure defined in that file.
   policy_default_values = {
-    ama_change_tracking_data_collection_rule_id    = "$${primary_change_tracking_data_collection_rule_id}"
-    ama_mdfc_sql_data_collection_rule_id           = "$${primary_mdfc_sql_data_collection_rule_id}"
+    ama_change_tracking_data_collection_rule_id    = "$${primary_ama_change_tracking_data_collection_rule_id}"
+    ama_mdfc_sql_data_collection_rule_id           = "$${primary_ama_mdfc_sql_data_collection_rule_id}"
     ama_vm_insights_data_collection_rule_id        = "$${primary_ama_vm_insights_data_collection_rule_id}"
     ama_user_assigned_managed_identity_id          = "$${primary_ama_user_assigned_managed_identity_id}"
     ama_user_assigned_managed_identity_name        = "$${primary_ama_user_assigned_managed_identity_name}"
@@ -79,7 +79,7 @@ management_group_settings = {
     amba_alz_management_subscription_id            = "$${subscription_ids.management}"
     amba_alz_resource_group_location               = "$${starter_location_01}"
     amba_alz_resource_group_name                   = "$${primary_amba_resource_group_name}"
-    amba_alz_user_assigned_managed_identity_name   = "$${primary_amba_user_assigned_managed_identity_name}"
+    amba_alz_user_assigned_managed_identity_name   = "$${primary_ama_user_assigned_managed_identity_name}"
     amba_alz_action_group_email                    = []
     amba_alz_arm_role_id                           = []
     amba_alz_resource_group_tags                   = {}
@@ -220,6 +220,7 @@ custom_replacements = {
     primary_gateway_subnet_route_table_name = "rt-gw-hub-$${starter_location_01}"
 
     # EXPRESS ROUTE NOTE: Use these variables if deploying express route
+    primary_express_route_resource_group_name = "rg-er-$${starter_location_01}"
     primary_virtual_network_gateway_express_route_name = "vgw-hub-er-$${starter_location_01}"
     primary_express_route_circuit_name                 = "erc-hub-$${starter_location_01}"
     primary_express_route_connection_name              = "cn-er-vng-$${starter_location_01}"
@@ -268,12 +269,12 @@ custom_replacements = {
   NOTE: You cannot refer to another custom resource group identifier in this variable.
   */
   resource_group_identifiers = {
-    primary_management_resource_group_id = "/subscriptions/$${subscription_id_management}/resourcegroups/$${management_resource_group_name}"
+    primary_management_resource_group_id = "/subscriptions/$${subscription_id_management}/resourcegroups/$${primary_management_resource_group_name}"
     primary_amba_resource_group_id       = "/subscriptions/$${subscription_id_management}/resourcegroups/$${primary_amba_resource_group_name}"
     primary_hub_resource_group_id        = "/subscriptions/$${subscription_id_connectivity}/resourceGroups/$${primary_connectivity_hub_resource_group_name}"
     dns_resource_group_id                = "/subscriptions/$${subscription_id_connectivity}/resourceGroups/$${dns_resource_group_name}"
     # EXPRESS ROUTE NOTE: Use this variable to set the Express Route Circuit resource group ID reference. This is used in the virtual network gateway configuration.
-    primary_express_route_resource_group_id = "/subscriptions/$${subscription_id_connectivity}/resourceGroups/$${express_route_resource_group_name}"
+    primary_express_route_resource_group_id = "/subscriptions/$${subscription_id_connectivity}/resourceGroups/$${primary_express_route_resource_group_name}"
   }
 
   /* 
@@ -283,13 +284,13 @@ custom_replacements = {
   NOTE: You cannot refer to another custom resource identifier in this variable.
   */
   resource_identifiers = {
-    primary_log_analytics_workspace_id              = "$${management_resource_group_id}/providers/Microsoft.OperationalInsights/workspaces/$${primary_log_analytics_workspace_name}"
-    primary_change_tracking_data_collection_rule_id = "$${management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_change_tracking_name}"
-    primary_mdfc_sql_data_collection_rule_id        = "$${management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_defender_sql_name}"
-    primary_vm_insights_data_collection_rule_id     = "$${management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_vm_insights_name}"
-    primary_user_assigned_managed_identity_id       = "$${management_resource_group_id}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$${primary_ama_user_assigned_managed_identity_name}"
+    primary_log_analytics_workspace_id              = "$${primary_management_resource_group_id}/providers/Microsoft.OperationalInsights/workspaces/$${primary_log_analytics_workspace_name}"
+    primary_ama_change_tracking_data_collection_rule_id = "$${primary_management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_change_tracking_name}"
+    primary_ama_mdfc_sql_data_collection_rule_id        = "$${primary_management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_defender_sql_name}"
+    primary_ama_vm_insights_data_collection_rule_id     = "$${primary_management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_vm_insights_name}"
+    primary_ama_user_assigned_managed_identity_id       = "$${primary_management_resource_group_id}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$${primary_ama_user_assigned_managed_identity_name}"
     # EXPRESS ROUTE NOTE: Use this variable to set the Express Route Circuit ID reference. This is used in the virtual network gateway configuration.
-    primary_express_route_circuit_id = "$${express_route_resource_group_id}/providers/Microsoft.Network/expressRouteCircuits/$${primary_express_route_circuit_name}"
+    primary_express_route_circuit_id = "$${primary_express_route_resource_group_id}/providers/Microsoft.Network/expressRouteCircuits/$${primary_express_route_circuit_name}"
     # DDOS PROTECTION PLAN NOTE: Use this variable to set the DDoS Protection Plan ID reference. This is used in the hub virtual network configuration if deploying DDoS Protection.
     primary_ddos_protection_plan_id = "$${primary_hub_resource_group_id}/providers/Microsoft.Network/ddosProtectionPlans/$${primary_ddos_protection_plan_name}"
   }
@@ -444,7 +445,7 @@ hub_virtual_networks = {
 
       route_table_bgp_route_propagation_enabled = true
       route_table_creation_enabled              = true
-      route_table_name                          = "$${primary_express_route_route_table_name}"
+      route_table_name                          = "$${primary_gateway_subnet_route_table_name}"
       route_table_custom_routes                 = {}
       # EXPRESS ROUTE NOTE: Use this block to configure the Express Route virtual network gateway settings if deploying Express Route connectivity. The express_route_circuits block is used to link the Express Route Circuit to the virtual network gateway and configure the connection settings. The peering block is used to configure the peering settings for the Express Route Circuit.
       # express_route = {
@@ -482,7 +483,7 @@ hub_virtual_networks = {
       #       id = "$${primary_express_route_circuit_id}" # The ID of the ExpressRoute Circuit that must already exist
       #       connection = {
       #         name                = "$${primary_express_route_connection_name}"
-      #         resource_group_name = "$${express_route_resource_group_name}"
+      #         resource_group_name = "$${primary_express_route_resource_group_name}"
       #         #shared_key                     = "$${express_route_circuit_shared_key}" # Should be stored in Key Vault, ALZ owner to provide to the ER provider
       #         express_route_gateway_bypass   = true
       #         private_link_fast_path_enabled = true
@@ -491,7 +492,7 @@ hub_virtual_networks = {
       #       peering = {
       #         peering_type                  = "AzurePrivatePeering"
       #         vlan_id                       = 0 # VLAN ID must be number not string
-      #         resource_group_name           = "$${express_route_resource_group_name}"
+      #         resource_group_name           = "$${primary_express_route_resource_group_name}"
       #         primary_peer_address_prefix   = "TO-BE-UPDATED" # recommended /30
       #         secondary_peer_address_prefix = "TO-BE-UPDATED" # recommended /30
       #         ipv4_enabled                  = true
