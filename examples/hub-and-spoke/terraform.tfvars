@@ -447,116 +447,120 @@ hub_virtual_networks = {
       route_table_name                          = "$${primary_express_route_route_table_name}"
       route_table_custom_routes                 = {}
       # EXPRESS ROUTE NOTE: Use this block to configure the Express Route virtual network gateway settings if deploying Express Route connectivity. The express_route_circuits block is used to link the Express Route Circuit to the virtual network gateway and configure the connection settings. The peering block is used to configure the peering settings for the Express Route Circuit.
-      #   express_route = {
-      #     parent_id                             = "$${primary_hub_resource_group_id}"
-      #     name                                  = "$${primary_virtual_network_gateway_express_route_name}"
-      #     sku                                   = "ErGw3AZ"
-      #     express_route_remote_vnet_traffic_enabled = false
-      #     hosted_on_behalf_of_public_ip_enabled = true
-      #     # NOTE: To use this, set the hosted_on_behalf_of_public_ip_enabled to false. The ip_configurations block is not required for the virtual network gateway deployment, but if you want to use it, you can uncomment the block and provide the necessary variables. The public IP configuration in the ip_configurations block will override the default public IP configuration of the virtual network gateway.
-      #     # ip_configurations = {
-      #     #   default = {
-      #     #     name = "vnetGatewayConfigdefault"
-      #     #     public_ip = {
-      #     #       name                    = "$${primary_virtual_network_gateway_express_route_public_ip_name}"
-      #     #       zones                   = [1, 2, 3]
-      #     #       creation_enabled        = true
-      #     #       allocation_method       = "Static"   # Static or Dynamic
-      #     #       sku                     = "Standard" # Standard or Basic
-      #     #       sku_tier                = "Regional" # Regional or Global
-      #     #       zones                   = [1, 2, 3]
-      #     #       ddos_protection_mode    = "Enabled"
-      #     #       ddos_protection_plan_id = null
-      #     #     }
-      #     #   }
-      #     # }
+      # express_route = {
+      #   parent_id                             = "$${primary_hub_resource_group_id}"
+      #   name                                  = "$${primary_virtual_network_gateway_express_route_name}"
+      #   sku                                   = "ErGw3AZ"
+      #   express_route_remote_vnet_traffic_enabled = false
+      #   hosted_on_behalf_of_public_ip_enabled = true
+      #   # NOTE: To use this, set the hosted_on_behalf_of_public_ip_enabled to false. The ip_configurations block is not required for the virtual network gateway deployment, but if you want to use it, you can uncomment the block and provide the necessary variables. The public IP configuration in the ip_configurations block will override the default public IP configuration of the virtual network gateway.
+      #   # ip_configurations = {
+      #   #   default = {
+      #   #     name = "vnetGatewayConfigdefault"
+      #   #     public_ip = {
+      #   #       name                    = "$${primary_virtual_network_gateway_express_route_public_ip_name}"
+      #   #       zones                   = [1, 2, 3]
+      #   #       creation_enabled        = true
+      #   #       allocation_method       = "Static"   # Static or Dynamic
+      #   #       sku                     = "Standard" # Standard or Basic
+      #   #       sku_tier                = "Regional" # Regional or Global
+      #   #       zones                   = [1, 2, 3]
+      #   #       ddos_protection_mode    = "Enabled"
+      #   #       ddos_protection_plan_id = null
+      #   #     }
+      #   #   }
+      #   # }
 
-      #     vpn_type = "RouteBased" # PolicyBased or RouteBased, ExpressRoute only supports RouteBased
-      #     diagnostic_settings_virtual_network_gateway = {
-      #       name                           = "diag-er-law-$${starter_location_01}"
-      #       workspace_resource_id          = "$${primary_log_analytics_workspace_id}"
-      #       log_analytics_destination_type = "Dedicated"
-      #     }
-      #     express_route_circuits = {
-      #       primary = {
-      #         id = "$${primary_express_route_circuit_id}" # The ID of the ExpressRoute Circuit that must already exist
-      #         connection = {
-      #           name                = "$${primary_express_route_connection_name}"
-      #           resource_group_name = "$${express_route_resource_group_name}"
-      #           #shared_key                     = "$${express_route_circuit_shared_key}" # Should be stored in Key Vault, ALZ owner to provide to the ER provider
-      #           express_route_gateway_bypass   = true
-      #           private_link_fast_path_enabled = true
-      #           routing_weight                 = 10
-      #         }
-      #         peering = {
-      #           peering_type                  = "AzurePrivatePeering"
-      #           vlan_id                       = 0 # VLAN ID must be number not string
-      #           resource_group_name           = "$${express_route_resource_group_name}"
-      #           primary_peer_address_prefix   = "TO-BE-UPDATED" # recommended /30
-      #           secondary_peer_address_prefix = "TO-BE-UPDATED" # recommended /30
-      #           ipv4_enabled                  = true
-      #           peer_asn                      = 0 # ASN must be number not string
-      #         }
+      #   vpn_type = "RouteBased" # PolicyBased or RouteBased, ExpressRoute only supports RouteBased
+      #   diagnostic_settings_virtual_network_gateway = {
+      #     name                           = "diag-er-law-$${starter_location_01}"
+      #     workspace_resource_id          = "$${primary_log_analytics_workspace_id}"
+      #     log_analytics_destination_type = "Dedicated"
+      #   }
+      #   express_route_circuits = {
+      #     primary = {
+      #       id = "$${primary_express_route_circuit_id}" # The ID of the ExpressRoute Circuit that must already exist
+      #       connection = {
+      #         name                = "$${primary_express_route_connection_name}"
+      #         resource_group_name = "$${express_route_resource_group_name}"
+      #         #shared_key                     = "$${express_route_circuit_shared_key}" # Should be stored in Key Vault, ALZ owner to provide to the ER provider
+      #         express_route_gateway_bypass   = true
+      #         private_link_fast_path_enabled = true
+      #         routing_weight                 = 10
+      #       }
+      #       peering = {
+      #         peering_type                  = "AzurePrivatePeering"
+      #         vlan_id                       = 0 # VLAN ID must be number not string
+      #         resource_group_name           = "$${express_route_resource_group_name}"
+      #         primary_peer_address_prefix   = "TO-BE-UPDATED" # recommended /30
+      #         secondary_peer_address_prefix = "TO-BE-UPDATED" # recommended /30
+      #         ipv4_enabled                  = true
+      #         peer_asn                      = 0 # ASN must be number not string
       #       }
       #     }
       #   }
+      # }
       # VPN NOTE: Use this block to configure the VPN virtual network gateway settings if deploying VPN connectivity. The ip_configurations block is used to configure the public IP settings for the virtual network gateway.
-      #   vpn = {
-      #     parent_id                             = "$${primary_hub_resource_group_id}"
-      #     name                                  = "$${primary_virtual_network_gateway_vpn_name}"
-      #     vpn_bgp_enabled                       = false
-      #     vpn_active_active_enabled           = true
-      #     sku                                   = "VpnGw2"
-      #     vpn_type                              = "RouteBased" # PolicyBased or RouteBased
-      #     ip_configurations = {
-      #       default = {
-      #         name = "vnetGatewayConfigdefault"
-      #         public_ip = {
-      #           name                    = "$${primary_virtual_network_gateway_vpn_public_ip_name_1}"
-      #           zones                   = [1, 2, 3]
-      #           creation_enabled        = true
-      #           allocation_method       = "Static"   # Static or Dynamic
-      #           sku                     = "Standard" # Standard or Basic
-      #           sku_tier                = "Regional" # Regional or Global
-      #           zones                   = [1, 2, 3]
-      #           # DDOS PROTECTION NOTE: Use the ddos_protection_mode and ddos_protection_plan_id to configure DDoS Protection for the virtual network gateway public IPs if deploying DDoS Protection. The ddos_protection_plan_id should be the resource ID of an existing DDoS Protection Plan.
-      #           ddos_protection_mode    = "Enabled"
-      #           ddos_protection_plan_id = null
-      #         }
-      #       }
-      #       secondary = {
-      #         name = "vnetGatewayConfigSecondary"
-      #         public_ip = {
-      #           name                    = "$${primary_virtual_network_gateway_vpn_public_ip_name_2}"
-      #           zones                   = [1, 2, 3]
-      #           creation_enabled        = true
-      #           allocation_method       = "Static"   # Static or Dynamic
-      #           sku                     = "Standard" # Standard or Basic
-      #           sku_tier                = "Regional" # Regional or Global
-      #           zones                   = [1, 2, 3]
-      #           # DDOS PROTECTION NOTE: Use the ddos_protection_mode and ddos_protection_plan_id to configure DDoS Protection for the virtual network gateway public IPs if deploying DDoS Protection. The ddos_protection_plan_id should be the resource ID of an existing DDoS Protection Plan.
-      #           ddos_protection_mode    = "Enabled"
-      #           ddos_protection_plan_id = null
-      #         }
+      # vpn = {
+      #   parent_id                             = "$${primary_hub_resource_group_id}"
+      #   name                                  = "$${primary_virtual_network_gateway_vpn_name}"
+      #   vpn_bgp_enabled                       = false
+      #   vpn_active_active_enabled           = true
+      #   sku                                   = "VpnGw2"
+      #   vpn_type                              = "RouteBased" # PolicyBased or RouteBased
+      #   ip_configurations = {
+      #     active_active_1 = {
+      #       name = "vnetGatewayConfigdefault"
+      #       public_ip = {
+      #         name                    = "$${primary_virtual_network_gateway_vpn_public_ip_name_1}"
+      #         zones                   = [1, 2, 3]
+      #         creation_enabled        = true
+      #         allocation_method       = "Static"   # Static or Dynamic
+      #         sku                     = "Standard" # Standard or Basic
+      #         sku_tier                = "Regional" # Regional or Global
+      #         zones                   = [1, 2, 3]
+      #         # DDOS PROTECTION NOTE: Use the ddos_protection_mode and ddos_protection_plan_id to configure DDoS Protection for the virtual network gateway public IPs if deploying DDoS Protection. The ddos_protection_plan_id should be the resource ID of an existing DDoS Protection Plan.
+      #         ddos_protection_mode    = "Enabled"
+      #         ddos_protection_plan_id = null
       #       }
       #     }
-      #     local_network_gateways = {
-      #         default = {
-      #             name                = "lngw-onpremises-001"
-      #             resource_group_name = "$${primary_connectivity_hub_resource_group_name}"
-      #             gateway_ip_address  = "TO-BE-UPDATED" # This is the public IP address of the on-premises VPN device that will be connecting to the virtual network gateway.
-      #             gateway_fqdn         = null # This is the fully qualified domain name of the on-premises VPN device that will be connecting to the virtual network gateway. This is an optional parameter, but if provided, it will be used instead of the gateway_ip_address for the connection configuration.
-      #             local_network_address_space = ["TO-BE-UPDATED"] # This is the address space of the on-premises network that will be connecting to the virtual network gateway.
-      #             connection = {
-      #                 name                = "cn-lngw-$${starter_location_01}-to-onpremises-001"
-      #                 resource_group_name = "$${primary_connectivity_hub_resource_group_name}"
-      #                 connection_mode = "Default" # Default or ExpressRoute
-      #                 enable_bgp                     = false
-      #                 routing_weight                 = 10
-      #             }
-      #         }
+      #     active_active_2 = {
+      #       name = "vnetGatewayConfigSecondary"
+      #       public_ip = {
+      #         name                    = "$${primary_virtual_network_gateway_vpn_public_ip_name_2}"
+      #         zones                   = [1, 2, 3]
+      #         creation_enabled        = true
+      #         allocation_method       = "Static"   # Static or Dynamic
+      #         sku                     = "Standard" # Standard or Basic
+      #         sku_tier                = "Regional" # Regional or Global
+      #         zones                   = [1, 2, 3]
+      #         # DDOS PROTECTION NOTE: Use the ddos_protection_mode and ddos_protection_plan_id to configure DDoS Protection for the virtual network gateway public IPs if deploying DDoS Protection. The ddos_protection_plan_id should be the resource ID of an existing DDoS Protection Plan.
+      #         ddos_protection_mode    = "Enabled"
+      #         ddos_protection_plan_id = null
+      #       }
       #     }
       #   }
+      #   local_network_gateways = {
+      #     default = {
+      #       name                = "lngw-onpremises-001"
+      #       resource_group_name = "$${primary_connectivity_hub_resource_group_name}"
+      #       gateway_ip_address  = "TO-BE-UPDATED" # This is the public IP address of the on-premises VPN device that will be connecting to the virtual network gateway.
+      #       gateway_fqdn         = null # This is the fully qualified domain name of the on-premises VPN device that will be connecting to the virtual network gateway. This is an optional parameter, but if provided, it will be used instead of the gateway_ip_address for the connection configuration.
+      #       local_network_address_space = ["TO-BE-UPDATED"] # This is the address space of the on-premises network that will be connecting to the virtual network gateway.
+      #       connection = {
+      #           name                = "cn-lngw-$${starter_location_01}-to-onpremises-001"
+      #           resource_group_name = "$${primary_connectivity_hub_resource_group_name}"
+      #           connection_mode = "Default" # Default or ExpressRoute
+      #           type = "IPsec" # IPsec or Vnet2Vnet
+      #           connection_protocol = "IKEv2" # IKEv2 or IKEv1
+      #           dpd_timeout_seconds = 45
+      #           enable_bgp                     = false
+      #           local_azure_ip_address_enabled = false
+      #           routing_weight                 = 10
+      #       }
+      #     }
+      #   }
+      # }
     }
 
     private_dns_resolver = {
