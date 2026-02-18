@@ -142,7 +142,7 @@ management_group_settings = {
     # }
     connectivity = {
       policy_assignments = {
-        # DDOS CONFIGURATION ##################################################
+        # DDOS PROTECTION NOTE ##################################################
         Enable-DDoS-VNET = {
           enforcement_mode = "DoNotEnforce"
         }
@@ -183,7 +183,7 @@ custom_replacements = {
   */
   names = {
     # Defender email security contact
-    defender_email_security_contact = "" # TO BE UPDATED
+    defender_email_security_contact = "" # TO-BE-UPDATED
 
     # Resource group names
     primary_management_resource_group_name       = "rg-management-$${starter_location_01}"
@@ -340,7 +340,7 @@ hub_virtual_networks = {
       firewall_policy                       = true
       firewall                              = true
       virtual_network_gateway_express_route = false
-      virtual_network_gateway_vpn           = true
+      virtual_network_gateway_vpn           = false
       private_dns_resolver                  = true
       private_dns_zones                     = true
       bastion                               = true

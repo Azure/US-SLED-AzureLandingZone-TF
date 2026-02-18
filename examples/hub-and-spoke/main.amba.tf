@@ -1,6 +1,6 @@
 module "amba_primary_monitoring" {
   source  = "Azure/avm-ptn-monitoring-amba-alz/azurerm"
-  version = "0.1.1"
+  version = "0.3.0"
   providers = {
     azurerm = azurerm.management
   }
