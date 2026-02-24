@@ -578,14 +578,15 @@ hub_virtual_networks = {
       subnet_name                            = "$${primary_private_dns_resolver_inbound_subnet_name}"
       subnet_default_outbound_access_enabled = false
       subnet_address_prefix                  = "$${primary_private_dns_resolver_inbound_subnet_address_prefix}"
-      inbound_endpoints = {
-        default = {
-          name                         = "dns-default-inbound-endpoint"
-          subnet_name                  = "$${primary_private_dns_resolver_inbound_subnet_name}"
-          private_ip_allocation_method = "Static"        # Static or Dynamic, for predictable IP address assignment, use Static and specify the private_ip_address. For automatic IP address assignment, use Dynamic and do not specify the private_ip_address.
-          private_ip_address           = "TO-BE-UPDATED" # This should be an available IP address within the private DNS resolver inbound subnet address prefix
-        }
-      }
+      # This is only needed for additional inbound endpoints beyond the default one, which gets created in the specified subnet and assigned the .4 IP address of that subnet. If you only need the default inbound endpoint, you can leave this block empty.
+      # inbound_endpoints = {
+      #   alternate = {
+      #     name                         = "dns-default-inbound-endpoint"
+      #     subnet_name                  = "$${primary_private_dns_resolver_inbound_subnet_name}"
+      #     private_ip_allocation_method = "Static"        # Static or Dynamic, for predictable IP address assignment, use Static and specify the private_ip_address. For automatic IP address assignment, use Dynamic and do not specify the private_ip_address.
+      #     private_ip_address           = "TO-BE-UPDATED" # This should be an available IP address within the private DNS resolver inbound subnet address prefix, should not be the .4 IP since the default inbound endpoint gets assigned to that IP.
+      #   }
+      # }
       outbound_endpoints = {
         default = {
           name        = "dns-default-outbound-endpoint"
