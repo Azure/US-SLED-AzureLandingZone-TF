@@ -13,6 +13,8 @@ Replacements are denoted by the dollar-dollar curly braces token (e.g. $${starte
 `subscription_id_management`: The subscription ID of the subscription to deploy the management resources to, sourced from the variable `subscription_id_management`.
 */
 
+#  If you leave this value blank, it will create the landing zone management groups under the tenant root group. If you need to create it under another intermediary management group,
+# please specify the management group id here and go to the lib/architecture_definitions/alz_custom.yaml file to update the parent_id property on line 8 with the same management group id as this.
 root_parent_management_group_id = "TO-BE-UPDATED"
 starter_locations = [
   "TO-BE-UPDATED"
