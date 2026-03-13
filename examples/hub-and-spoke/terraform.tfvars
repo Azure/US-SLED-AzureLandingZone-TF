@@ -23,9 +23,9 @@ starter_locations = [
 starter_locations_short = {}
 
 subscription_ids = {
-  management   = "TO-BE-UPDATED",
-  identity     = "TO-BE-UPDATED",
-  connectivity = "TO-BE-UPDATED",
+  management   = "TO-BE-UPDATED", # Requires the ManagedIdntity, Insights, OperationalInsights, and PolicyInsights providers registered
+  identity     = "TO-BE-UPDATED", # Requires the PolicyInsights provider registered
+  connectivity = "TO-BE-UPDATED", # Requires the Network provider registered
   security     = "TO-BE-UPDATED"
 }
 
@@ -143,6 +143,15 @@ management_group_settings = {
     #   }
     # }
     connectivity = {
+      policy_assignments = {
+        # DDOS PROTECTION NOTE ##################################################
+        Enable-DDoS-VNET = {
+          enforcement_mode = "DoNotEnforce"
+        }
+        #######################################################################
+      }
+    }
+    landingzones = {
       policy_assignments = {
         # DDOS PROTECTION NOTE ##################################################
         Enable-DDoS-VNET = {
