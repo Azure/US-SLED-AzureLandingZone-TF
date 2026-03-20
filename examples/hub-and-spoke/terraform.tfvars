@@ -81,7 +81,7 @@ management_group_settings = {
     amba_alz_management_subscription_id            = "$${subscription_id_management}"
     amba_alz_resource_group_location               = "$${starter_location_01}"
     amba_alz_resource_group_name                   = "$${primary_amba_resource_group_name}"
-    amba_alz_user_assigned_managed_identity_name   = "$${primary_ama_user_assigned_managed_identity_name}"
+    amba_alz_user_assigned_managed_identity_name   = "$${primary_amba_user_assigned_managed_identity_name}"
     amba_alz_action_group_email                    = []
     amba_alz_arm_role_id                           = []
     amba_alz_resource_group_tags                   = {}
@@ -206,6 +206,7 @@ custom_replacements = {
     primary_log_analytics_workspace_name            = "law-management-$${starter_location_01}"
     primary_automation_account_name                 = "aa-management-$${starter_location_01}"
     primary_ama_user_assigned_managed_identity_name = "uami-management-ama-$${starter_location_01}"
+    primary_amba_user_assigned_managed_identity_name = "uami-amba-$${starter_location_01}"
 
     # Diagnostic settings names
     dcr_change_tracking_name = "dcr-change-tracking"
