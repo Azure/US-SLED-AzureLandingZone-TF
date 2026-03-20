@@ -282,8 +282,8 @@ custom_replacements = {
   NOTE: You cannot refer to another custom resource group identifier in this variable.
   */
   resource_group_identifiers = {
-    primary_management_resource_group_id = "/subscriptions/$${subscription_id_management}/resourcegroups/$${primary_management_resource_group_name}"
-    primary_amba_resource_group_id       = "/subscriptions/$${subscription_id_management}/resourcegroups/$${primary_amba_resource_group_name}"
+    primary_management_resource_group_id = "/subscriptions/$${subscription_id_management}/resourceGroups/$${primary_management_resource_group_name}"
+    primary_amba_resource_group_id       = "/subscriptions/$${subscription_id_management}/resourceGroups/$${primary_amba_resource_group_name}"
     primary_hub_resource_group_id        = "/subscriptions/$${subscription_id_connectivity}/resourceGroups/$${primary_connectivity_hub_resource_group_name}"
     dns_resource_group_id                = "/subscriptions/$${subscription_id_connectivity}/resourceGroups/$${dns_resource_group_name}"
     # EXPRESS ROUTE NOTE: Use this variable to set the Express Route Circuit resource group ID reference. This is used in the virtual network gateway configuration.
