@@ -1,40 +1,48 @@
 # Azure Landing Zones Terraform Accelerator Example (US SLED)
 
-This repository contains a full, practical example for deploying Azure Landing Zones with the Azure Verified Modules (AVM) ALZ accelerator patterns.
+This repository **is** a full, in-depth example of deploying Azure Landing Zones using the [Azure Verified Modules (AVM) ALZ Terraform accelerator](https://aka.ms/alz/acc). It demonstrates a complete platform landing zone deployment covering:
 
-The example is built to show end-to-end configuration across platform areas such as:
+- Management group hierarchy and policy assignments
+- Management resources (Log Analytics, Automation Account, data collection rules)
+- Azure Monitor Baseline Alerts (AMBA) integration
+- Hub-and-spoke virtual network connectivity
 
-- Management group hierarchy and policy configuration
-- Management resources and AMBA integration
-- Hub-and-spoke networking
-- Optional connectivity paths (ExpressRoute and VPN)
-- Optional shared services (Firewall, Bastion, DDoS protection, DNS)
+## Getting started
 
-## Repository layout
+### Required values
 
-- `/examples/hub-and-spoke` – primary in-depth example
-  - `terraform.tfvars` – main configuration with guided placeholders and notes
-  - `README.md` – example-specific usage details
+Every value marked `TO-BE-UPDATED` in `terraform.tfvars` **must** be replaced before running Terraform. These include:
 
-## How to use this repository
+- Subscription IDs for connectivity, identity, management, and security subscriptions
+- Azure region(s) (`starter_locations`)
+- Root parent management group ID
+- Default management group name
 
-1. Review `/examples/hub-and-spoke/README.md` for the execution flow.
-2. Copy and update `/examples/hub-and-spoke/terraform.tfvars` values marked `TO-BE-UPDATED`.
-3. Use the note blocks in `terraform.tfvars` to locate feature-specific configuration quickly.
+Search the file for `TO-BE-UPDATED` to find every required value.
 
-## Finding where to configure specific capabilities
+### Running the deployment
 
-`/examples/hub-and-spoke/terraform.tfvars` includes labeled comments that point to feature areas. Search for these markers:
+1. Review [`examples/hub-and-spoke/README.md`](./examples/hub-and-spoke/README.md) for execution steps.
+2. Replace all `TO-BE-UPDATED` values in `terraform.tfvars`.
+3. Run `terraform init` and `terraform apply -var-file ./examples/hub-and-spoke/terraform.tfvars`.
 
-- `EXPRESS ROUTE NOTE`
-- `VPN NOTE`
-- `EXPRESS ROUTE & VPN NOTE`
-- `AZURE FIREWALL NOTE`
-- `BASTION NOTE`
-- `DDOS PROTECTION NOTE`
-- `MULTI-REGION NOTE`
+## Finding service-specific configuration
 
-These markers identify where to adjust placeholders and settings for each capability.
+Throughout `terraform.tfvars`, comment blocks use the pattern `# <SERVICE> NOTE:` to mark every location where a given service is configured. Search for any of the tags below to find all relevant settings for that capability:
+
+| Comment marker | Where it appears |
+|---|---|
+| `# EXPRESS ROUTE NOTE:` | ExpressRoute gateway name, SKU, circuit ID, and connection settings |
+| `# VPN NOTE:` | VPN gateway name, SKU, public IPs, local network gateway, and connection settings |
+| `# EXPRESS ROUTE & VPN NOTE:` | Shared gateway subnet route table used by both gateway types |
+| `# AZURE FIREWALL NOTE:` | Azure Firewall name, SKU, subnet sizing, and UDR configuration |
+| `# AZURE FIREWALL POLICY NOTE:` | Firewall policy base policy inheritance and rule override settings |
+| `# AZURE FIREWALL NVA NOTE:` | Third-party NVA name variables and hub router IP |
+| `# HUB NVA NOTE:` | NVA hub router IP used in spoke UDR next-hop settings |
+| `# BASTION NOTE:` | Azure Bastion host name, public IP, and subnet settings |
+| `# DDOS PROTECTION NOTE:` | DDoS Protection Plan name, ID reference, and enforcement mode |
+| `# ROUTE TABLE NOTE:` | Route table names and firewall route references |
+| `# MULTI-REGION NOTE:` | Secondary region hub, spoke, and cross-region routing settings |
 
 ## Contributing
 
