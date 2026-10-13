@@ -203,9 +203,9 @@ custom_replacements = {
     dns_resource_group_name                      = "rg-hub-dns-$${starter_location_01}"
 
     # Management resources names
-    primary_log_analytics_workspace_name            = "law-management-$${starter_location_01}"
-    primary_automation_account_name                 = "aa-management-$${starter_location_01}"
-    primary_ama_user_assigned_managed_identity_name = "uami-management-ama-$${starter_location_01}"
+    primary_log_analytics_workspace_name             = "law-management-$${starter_location_01}"
+    primary_automation_account_name                  = "aa-management-$${starter_location_01}"
+    primary_ama_user_assigned_managed_identity_name  = "uami-management-ama-$${starter_location_01}"
     primary_amba_user_assigned_managed_identity_name = "uami-amba-$${starter_location_01}"
 
     # Diagnostic settings names
@@ -229,11 +229,11 @@ custom_replacements = {
     primary_route_table_firewall_name     = "rt-hub-fw-$${starter_location_01}"
     primary_route_table_user_subnets_name = "rt-hub-std-$${starter_location_01}"
     # EXPRESS ROUTE & VPN NOTE: Use these variables if deploying express route or VPN gateways
-    primary_gateway_subnet_route_table_name = "rt-gw-hub-$${starter_location_01}"
+    primary_gateway_subnet_route_table_name                = "rt-gw-hub-$${starter_location_01}"
     primary_gateway_subnet_route_table_firewall_route_name = "rt-hub-gateway-fw-$${starter_location_01}"
 
     # EXPRESS ROUTE NOTE: Use these variables if deploying express route
-    primary_express_route_resource_group_name = "rg-er-$${starter_location_01}"
+    primary_express_route_resource_group_name          = "rg-er-$${starter_location_01}"
     primary_virtual_network_gateway_express_route_name = "vgw-hub-er-$${starter_location_01}"
     primary_express_route_circuit_name                 = "erc-hub-$${starter_location_01}"
     primary_express_route_connection_name              = "cn-er-vng-$${starter_location_01}"
@@ -248,6 +248,8 @@ custom_replacements = {
     primary_private_dns_resolver_name                 = "pdr-hub-dns-$${starter_location_01}"
     primary_private_dns_resolver_inbound_subnet_name  = "InboundEndpointSubnet"
     primary_private_dns_resolver_outbound_subnet_name = "OutboundEndpointSubnet"
+    primary_nat_gateway_name                          = "natgw-hub-$${starter_location_01}"
+    primary_dns_resolver_policy_name                  = "dnspol-hub-$${starter_location_01}"
 
     # BASTION NOTE: Use these variables if deploying Bastion
     primary_bastion_host_name           = "bas-hub-$${starter_location_01}"
@@ -297,7 +299,7 @@ custom_replacements = {
   NOTE: You cannot refer to another custom resource identifier in this variable.
   */
   resource_identifiers = {
-    primary_log_analytics_workspace_id              = "$${primary_management_resource_group_id}/providers/Microsoft.OperationalInsights/workspaces/$${primary_log_analytics_workspace_name}"
+    primary_log_analytics_workspace_id                  = "$${primary_management_resource_group_id}/providers/Microsoft.OperationalInsights/workspaces/$${primary_log_analytics_workspace_name}"
     primary_ama_change_tracking_data_collection_rule_id = "$${primary_management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_change_tracking_name}"
     primary_ama_mdfc_sql_data_collection_rule_id        = "$${primary_management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_defender_sql_name}"
     primary_ama_vm_insights_data_collection_rule_id     = "$${primary_management_resource_group_id}/providers/Microsoft.Insights/dataCollectionRules/$${dcr_vm_insights_name}"
@@ -357,6 +359,8 @@ hub_virtual_networks = {
       virtual_network_gateway_vpn           = false
       private_dns_resolver                  = true
       private_dns_zones                     = true
+      dns_resolver_policy                   = true
+      nat_gateway                           = true
       bastion                               = true
     }
     location                  = "$${starter_location_01}"
@@ -380,6 +384,9 @@ hub_virtual_networks = {
         dns_outbound = {
           name             = "$${primary_private_dns_resolver_outbound_subnet_name}"
           address_prefixes = ["$${primary_private_dns_resolver_outbound_subnet_address_prefix}"]
+          nat_gateway = {
+            assign_generated_nat_gateway = false
+          }
           route_table = {
             assign_generated_route_table = false
           }
@@ -398,6 +405,15 @@ hub_virtual_networks = {
 
     }
 
+    nat_gateway = {
+      name = "$${primary_nat_gateway_name}"
+      ip_configurations = {
+        default = {
+          is_default = true
+        }
+      }
+    }
+
     firewall = {
       name                                              = "$${primary_firewall_name}"
       subnet_address_prefix                             = "$${primary_az_firewall_subnet_address_prefix}"
@@ -408,6 +424,9 @@ hub_virtual_networks = {
       sku_name                                          = "AZFW_VNet"
       sku_tier                                          = "Standard"
       zones                                             = [1, 2, 3]
+      firewall_subnet_nat_gateway = {
+        assign_generated_nat_gateway = true
+      }
       ip_configurations = {
         default = {
           is_default = false
@@ -620,6 +639,18 @@ hub_virtual_networks = {
               }
             }
           }
+        }
+      }
+    }
+
+    dns_resolver_policy = {
+      name      = "$${primary_dns_resolver_policy_name}"
+      parent_id = "$${dns_resource_group_id}"
+      rules = {
+        threat_intelligence = {
+          priority             = 100
+          action               = "Block"
+          managed_domain_lists = ["AzureDnsThreatIntel"]
         }
       }
     }
