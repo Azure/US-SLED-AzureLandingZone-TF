@@ -31,13 +31,15 @@ DESCRIPTION
 variable "hub_virtual_networks" {
   type = map(object({
     enabled_resources = optional(object({
-      firewall                              = optional(any, true)
-      firewall_policy                       = optional(any, true)
-      bastion                               = optional(any, true)
-      virtual_network_gateway_express_route = optional(any, true)
-      virtual_network_gateway_vpn           = optional(any, true)
-      private_dns_zones                     = optional(any, true)
-      private_dns_resolver                  = optional(any, true)
+      firewall                              = optional(bool, true)
+      firewall_policy                       = optional(bool, true)
+      bastion                               = optional(bool, true)
+      virtual_network_gateway_express_route = optional(bool, true)
+      virtual_network_gateway_vpn           = optional(bool, true)
+      private_dns_zones                     = optional(bool, true)
+      private_dns_resolver                  = optional(bool, true)
+      dns_resolver_policy                   = optional(bool, true)
+      nat_gateway                           = optional(bool, false)
     }), {})
 
     default_hub_address_space = optional(string)
@@ -83,7 +85,8 @@ variable "hub_virtual_networks" {
           name             = string
           address_prefixes = list(string)
           nat_gateway = optional(object({
-            id = string
+            id                           = optional(string)
+            assign_generated_nat_gateway = optional(bool, false)
           }))
           network_security_group = optional(object({
             id = string
@@ -115,6 +118,34 @@ variable "hub_virtual_networks" {
       )), {})
     }), {})
 
+    nat_gateway = optional(object({
+      name                    = optional(string)
+      parent_id               = optional(string)
+      location                = optional(string)
+      sku                     = optional(string, "StandardV2")
+      idle_timeout_in_minutes = optional(number, 4)
+      tags                    = optional(map(string), null)
+      zones                   = optional(set(string))
+      ip_configurations = optional(map(object({
+        is_default                 = optional(bool, false)
+        name                       = optional(string)
+        public_ip_creation_enabled = optional(bool, true)
+        public_ip_configuration = optional(object({
+          ip_version                     = optional(string, "IPv4")
+          name                           = optional(string)
+          public_ip_existing_resource_id = optional(string)
+          sku                            = optional(string, "StandardV2")
+          sku_tier                       = optional(string, "Regional")
+          zones                          = optional(set(string))
+          allocation_method              = optional(string, "Static")
+          public_ip_prefix_id            = optional(string)
+          domain_name_label              = optional(string)
+          idle_timeout_in_minutes        = optional(number, 4)
+          ddos_protection_mode           = optional(string, "VirtualNetworkInherited")
+        }), {})
+      })), {})
+    }), {})
+
     firewall = optional(object({
       name                                              = optional(string)
       resource_group_name                               = optional(string)
@@ -130,6 +161,10 @@ variable "hub_virtual_networks" {
       subnet_route_table_id                             = optional(string)
       tags                                              = optional(map(string))
       zones                                             = optional(list(string))
+      firewall_subnet_nat_gateway = optional(object({
+        id                           = optional(string, null)
+        assign_generated_nat_gateway = optional(bool, false)
+      }))
 
       default_ip_configuration = optional(object({
         is_default = optional(bool, true)
@@ -665,6 +700,32 @@ variable "hub_virtual_networks" {
       })), {})
       tags = optional(map(string), null)
     }), {})
+
+    dns_resolver_policy = optional(object({
+      name                               = optional(string)
+      parent_id                          = optional(string)
+      link_to_hub_virtual_network        = optional(bool, true)
+      virtual_network_link_name_template = optional(string, "$${hub_key}-$${location}-hub")
+      additional_virtual_network_links = optional(map(object({
+        name               = optional(string)
+        virtual_network_id = string
+      })), {})
+      domain_lists = optional(map(object({
+        name    = optional(string)
+        domains = list(string)
+        tags    = optional(map(string), null)
+      })), {})
+      rules = optional(map(object({
+        name                     = optional(string)
+        priority                 = number
+        action                   = optional(string, "Block")
+        state                    = optional(string, "Enabled")
+        domain_list_keys         = optional(list(string), [])
+        domain_list_resource_ids = optional(list(string), [])
+        managed_domain_lists     = optional(list(string), [])
+      })), {})
+      tags = optional(map(string), null)
+    }), null)
   }))
   default     = {}
   description = <<DESCRIPTION
@@ -680,6 +741,8 @@ The following top level attributes are supported:
     - `virtual_network_gateway_vpn` - (Optional) Should the VPN gateway be created? Default `true`.
     - `private_dns_zones` - (Optional) Should private DNS zones be created? Default `true`.
     - `private_dns_resolver` - (Optional) Should the private DNS resolver be created? Default `true`.
+    - `dns_resolver_policy` - (Optional) Should the DNS security policy be created? Default `true`.
+    - `nat_gateway` - (Optional) Should the NAT Gateway be created? Default `false`.
   - `default_hub_address_space` - (Optional) The default address space to use if not specified in hub_virtual_network. This defaults to `10.0.0.0/16` and increments to the next /16 for each region if not supplied.
   - `default_parent_id` - (Optional) The default parent resource group ID to use if not specified in hub_virtual_network or individual sections.
   - `location` - (Required) The Azure location where the hub network resources should be created.
@@ -688,8 +751,10 @@ The following top level attributes are supported:
   - `firewall_policy` - (Optional) The firewall policy settings.
   - `bastion` - (Optional) The bastion host settings.
   - `virtual_network_gateways` - (Optional) The virtual network gateway settings.
+  - `nat_gateway` - (Optional) The NAT Gateway settings.
   - `private_dns_zones` - (Optional) The private DNS zone settings.
   - `private_dns_resolver` - (Optional) The private DNS resolver settings.
+  - `dns_resolver_policy` - (Optional) The DNS security policy settings.
 
 ## Hub Virtual Network
 
@@ -726,7 +791,8 @@ The following top level attributes are supported:
     - `name` - The name of the subnet.
     - `address_prefixes` - The IPv4 address prefixes to use for the subnet in CIDR format.
     - `nat_gateway` - (Optional) An object with the following fields:
-      - `id` - The ID of the NAT Gateway which should be associated with the Subnet. Changing this forces a new resource to be created.
+      - `id` - (Optional) The ID of an existing NAT Gateway to associate with the subnet.
+      - `assign_generated_nat_gateway` - (Optional) Associate this subnet with the NAT Gateway generated by this module. Default `false`.
     - `network_security_group` - (Optional) An object with the following fields:
       - `id` - The ID of the Network Security Group which should be associated with the Subnet. Changing this forces a new association to be created.
     - `private_endpoint_network_policies_enabled` - (Optional) Enable or Disable network policies for the private endpoint on the subnet. Setting this to true will Enable the policy and setting this to false will Disable the policy. Defaults to true.
@@ -758,6 +824,9 @@ The following top level attributes are supported:
   - `management_subnet_default_outbound_access_enabled` - (Optional) Should the default outbound access be enabled for the Azure Firewall management subnet? Default `false`.
   - `private_ip_ranges` - (Optional) A list of private IP ranges to use for the Azure Firewall, to which the firewall will not NAT traffic. If not specified will use RFC1918.
   - `subnet_route_table_id` = (Optional) The resource id of the Route Table which should be associated with the Azure Firewall subnet. If not specified the module will assign the generated route table.
+  - `firewall_subnet_nat_gateway` - (Optional) An object to associate an existing NAT Gateway or the NAT Gateway generated by this module with the Azure Firewall subnet:
+    - `id` - (Optional) The ID of an existing NAT Gateway.
+    - `assign_generated_nat_gateway` - (Optional) Associate the NAT Gateway generated by this module. Default `false`.
   - `tags` - (Optional) A map of tags to apply to the Azure Firewall. If not specified
   - `zones` - (Optional) A list of availability zones to use for the Azure Firewall. Set to `[]` for no zones.
   - `default_ip_configuration` - (Optional) An object with the following fields. This is for legacy purpose, consider using `ip_configurations` instead. If `ip_configurations` is specified, this input will be ignored. If not specified the defaults below will be used:
@@ -1178,6 +1247,18 @@ The following top level attributes are supported:
   - `virtual_network_link_resolution_policy_default` - (Optional) The default resolution policy for virtual network links. Possible values are `Default` and `NxDomainRedirect`.
   - `tags` - (Optional) A map of tags to apply to the private DNS zones.
 
+## NAT Gateway
+
+- `nat_gateway` - (Optional) An object configuring a generated NAT Gateway. The following fields are supported:
+  - `name` - (Optional) The NAT Gateway name.
+  - `parent_id` - (Optional) The parent resource group ID. Defaults to the hub resource group.
+  - `location` - (Optional) The Azure location. Defaults to the hub location.
+  - `sku` - (Optional) The NAT Gateway SKU. Default `StandardV2`.
+  - `idle_timeout_in_minutes` - (Optional) The idle timeout. Default `4`.
+  - `tags` - (Optional) Tags to apply to the NAT Gateway.
+  - `zones` - (Optional) Availability zones for the NAT Gateway.
+  - `ip_configurations` - (Optional) A map of IP configurations; each can define `is_default`, `name`, `public_ip_creation_enabled`, and `public_ip_configuration`.
+
 ## Private DNS Resolver
 
 - `private_dns_resolver` - (Optional) An object with the following fields:
@@ -1220,6 +1301,18 @@ The following top level attributes are supported:
         - `enabled` - (Optional) Should the rule be enabled? Default `true`.
         - `metadata` - (Optional) A map of metadata.
   - `tags` - (Optional) A map of tags to apply to the DNS resolver.
+
+## DNS Resolver Policy (DNS Security Policy)
+
+- `dns_resolver_policy` - (Optional) An object configuring an Azure DNS Security Policy for this hub. The following fields are supported:
+  - `name` - (Optional) The policy name.
+  - `parent_id` - (Optional) The resource group ID for the policy and domain lists. Defaults to the hub resource group.
+  - `link_to_hub_virtual_network` - (Optional) Automatically link the policy to the hub virtual network. Default `true`.
+  - `virtual_network_link_name_template` - (Optional) The hub virtual network link name template.
+  - `additional_virtual_network_links` - (Optional) Additional virtual networks to link, each with an optional `name` and required `virtual_network_id`.
+  - `domain_lists` - (Optional) A map of domain lists, each with `domains` and optional `name` and `tags`.
+  - `rules` - (Optional) A map of rules, each with required `priority` and optional `name`, `action`, `state`, `domain_list_keys`, `domain_list_resource_ids`, and `managed_domain_lists`.
+  - `tags` - (Optional) Tags to apply to the policy.
 
 DESCRIPTION
 }
